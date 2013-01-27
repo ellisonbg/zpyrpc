@@ -46,5 +46,5 @@ from .proxy import (
     AsyncRemoteMethod, RemoteMethod, 
     RPCError, RemoteRPCError, RPCTimeoutError
 )
-from .serializer import Serializer, PickleSerializer, JSONSerializer
+from .serializer import *
 
