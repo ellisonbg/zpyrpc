@@ -102,6 +102,7 @@ class RPCBase(object):
             raise zmq.ZMQBindError('Could not find an available port')
         url = 'tcp://%s:%i' % (ip, port)
         self.urls.append(url)
+        return port
 
     def connect(self, url):
         """Connect the service to a url of the form proto://ip:port."""
