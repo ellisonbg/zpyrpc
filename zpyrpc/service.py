@@ -84,6 +84,8 @@ class RPCBase(object):
         * If ports is a list, we bind to the first free port in that list.
 
         In all cases we save the eventual url that we bind to.
+
+        This raises zmq.ZMQBindError if no free port can be found.
         """
         if isinstance(ports, int):
             ports = [ports]
@@ -95,6 +97,10 @@ class RPCBase(object):
                     self.socket.bind("tcp://%s:%i" % (ip, p))
                     port = p  
             except zmq.ZMQError:
+                # bind raises this if the port is not free
+                continue
+            except zmq.ZMQBindError:
+                # bind_to_random_port raises this if no port could be found
                 continue
             else:
                 break
