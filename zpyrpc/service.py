@@ -70,14 +70,43 @@ class RPCBase(object):
 
     def bind(self, url):
         """Bind the service to a url of the form proto://ip:port."""
-        self.urls.append(url)
         self.socket.bind(url)
+        self.urls.append(url)
+
+    def bind_ports(self, ip, ports):
+        """Try to bind a socket to the first available tcp port.
+
+        The ports argument can either be an integer valued port
+        or a list of ports to try. This attempts the following logic:
+
+        * If ports==0, we bind to a random port.
+        * If ports > 0, we bind to port.
+        * If ports is a list, we bind to the first free port in that list.
+
+        In all cases we save the eventual url that we bind to.
+        """
+        if isinstance(ports, int):
+            ports = [ports]
+        for p in ports:
+            try:
+                if p==0:
+                    port = self.socket.bind_to_random_port("tcp://%s" % ip)
+                else:
+                    self.socket.bind("tcp://%s:%i" % (ip, p))
+                    port = p  
+            except zmq.ZMQError:
+                continue
+            else:
+                break
+        else:
+            raise zmq.ZMQBindError('Could not find an available port')
+        url = 'tcp://%s:%i' % (ip, port)
+        self.urls.append(url)
 
     def connect(self, url):
         """Connect the service to a url of the form proto://ip:port."""
-        self.urls.append(url)
         self.socket.connect(url)
-
+        self.urls.append(url)
 
 class RPCService(RPCBase):
     """An RPC service that takes requests over a ROUTER socket."""
