@@ -6,7 +6,7 @@ Authors:
 """
 
 #-----------------------------------------------------------------------------
-#  Copyright (C) 2012. Brian Granger, Min Ragan-Kelley  
+#  Copyright (C) 2012. Brian Granger, Min Ragan-Kelley
 #
 #  Distributed under the terms of the BSD License.  The full license is in
 #  the file COPYING.BSD, distributed as part of this software.
@@ -95,7 +95,7 @@ class RPCBase(object):
                     port = self.socket.bind_to_random_port("tcp://%s" % ip)
                 else:
                     self.socket.bind("tcp://%s:%i" % (ip, p))
-                    port = p  
+                    port = p
             except zmq.ZMQError:
                 # bind raises this if the port is not free
                 continue
@@ -138,7 +138,7 @@ class RPCService(RPCBase):
         reply.extend([b'|', self.msg_id, status])
         reply.extend(data)
         return reply
-                    
+
     def _handle_request(self, msg_list):
         """Handle an incoming request.
 
@@ -156,7 +156,7 @@ class RPCService(RPCBase):
         i = msg_list.index(b'|')
         self.idents = msg_list[0:i]
         self.msg_id = msg_list[i+1]
-        method = msg_list[i+2]
+        method = msg_list[i+2].decode('utf-8')
         data = msg_list[i+3:]
         args, kwargs = self._serializer.deserialize_args_kwargs(data)
 
@@ -186,7 +186,7 @@ class RPCService(RPCBase):
         error_dict = {
             'ename' : str(etype.__name__),
             'evalue' : str(evalue),
-            'traceback' : traceback.format_exc(tb)
+            'traceback' : traceback.format_exc()
         }
         data_list = [jsonapi.dumps(error_dict)]
         reply = self._build_reply(b'FAILURE', data_list)
@@ -208,5 +208,3 @@ def rpc_method(f):
     """
     f.is_rpc_method = True
     return f
-
-
