@@ -13,5 +13,4 @@ setup(
     license = "Modified BSD",
     keywords = "ZeroMQ Tornado PyZMQ",
     url = "http://github.com/ellisonbg/zpyrpc",
-    use_2to3 = True,
 )

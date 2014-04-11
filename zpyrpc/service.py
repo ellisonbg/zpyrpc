@@ -18,7 +18,6 @@ Authors:
 
 import logging
 import sys
-import traceback
 
 import zmq
 from zmq.eventloop.zmqstream import ZMQStream
@@ -26,6 +25,7 @@ from zmq.eventloop.ioloop import IOLoop
 from zmq.utils import jsonapi
 
 from .serializer import PickleSerializer
+from .py3compat import format_exc
 
 
 #-----------------------------------------------------------------------------
@@ -186,7 +186,7 @@ class RPCService(RPCBase):
         error_dict = {
             'ename' : str(etype.__name__),
             'evalue' : str(evalue),
-            'traceback' : traceback.format_exc()
+            'traceback' : format_exc(tb)
         }
         data_list = [jsonapi.dumps(error_dict)]
         reply = self._build_reply(b'FAILURE', data_list)

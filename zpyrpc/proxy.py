@@ -27,6 +27,7 @@ from zmq.eventloop.ioloop import DelayedCallback
 from zmq.utils import jsonapi
 
 from .base import RPCBase
+from .py3compat import unicode_type
 
 #-----------------------------------------------------------------------------
 # RPC Service Proxy
@@ -38,14 +39,14 @@ class RPCServiceProxyBase(RPCBase):
     def _create_socket(self):
         self.socket = self.context.socket(zmq.DEALER)
         self.socket.setsockopt(
-            zmq.IDENTITY, unicode(uuid.uuid4()).encode('utf-8'))
+            zmq.IDENTITY, unicode_type(uuid.uuid4()).encode('utf-8'))
         self._init_stream()
 
     def _init_stream(self):
         pass
 
     def _build_request(self, method, args, kwargs):
-        msg_id = unicode(uuid.uuid4()).encode('utf-8')
+        msg_id = unicode_type(uuid.uuid4()).encode('utf-8')
         method = method.encode('utf-8')
         msg_list = [b'|', msg_id, method]
         data_list = self._serializer.serialize_args_kwargs(args, kwargs)
