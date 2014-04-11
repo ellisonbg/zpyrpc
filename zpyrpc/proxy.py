@@ -37,14 +37,15 @@ class RPCServiceProxyBase(RPCBase):
 
     def _create_socket(self):
         self.socket = self.context.socket(zmq.DEALER)
-        self.socket.setsockopt(zmq.IDENTITY, str(uuid.uuid4()).encode('utf-8'))
+        self.socket.setsockopt(
+            zmq.IDENTITY, unicode(uuid.uuid4()).encode('utf-8'))
         self._init_stream()
 
     def _init_stream(self):
         pass
 
     def _build_request(self, method, args, kwargs):
-        msg_id = str(uuid.uuid4()).encode('utf-8')
+        msg_id = unicode(uuid.uuid4()).encode('utf-8')
         method = method.encode('utf-8')
         msg_list = [b'|', msg_id, method]
         data_list = self._serializer.serialize_args_kwargs(args, kwargs)
