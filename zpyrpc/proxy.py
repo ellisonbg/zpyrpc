@@ -6,7 +6,7 @@ Authors:
 """
 
 #-----------------------------------------------------------------------------
-#  Copyright (C) 2012. Brian Granger, Min Ragan-Kelley  
+#  Copyright (C) 2012. Brian Granger, Min Ragan-Kelley
 #
 #  Distributed under the terms of the BSD License.  The full license is in
 #  the file COPYING.BSD, distributed as part of this software.
@@ -27,6 +27,7 @@ from zmq.eventloop.ioloop import DelayedCallback
 from zmq.utils import jsonapi
 
 from .base import RPCBase
+from .py3compat import unicode_type
 
 #-----------------------------------------------------------------------------
 # RPC Service Proxy
@@ -37,15 +38,16 @@ class RPCServiceProxyBase(RPCBase):
 
     def _create_socket(self):
         self.socket = self.context.socket(zmq.DEALER)
-        self.socket.setsockopt(zmq.IDENTITY, bytes(uuid.uuid4()))
+        self.socket.setsockopt(
+            zmq.IDENTITY, unicode_type(uuid.uuid4()).encode('utf-8'))
         self._init_stream()
 
     def _init_stream(self):
         pass
 
     def _build_request(self, method, args, kwargs):
-        msg_id = bytes(uuid.uuid4())
-        method = bytes(method)
+        msg_id = unicode_type(uuid.uuid4()).encode('utf-8')
+        method = method.encode('utf-8')
         msg_list = [b'|', msg_id, method]
         data_list = self._serializer.serialize_args_kwargs(args, kwargs)
         msg_list.extend(data_list)
@@ -204,7 +206,7 @@ class RemoteMethodBase(object):
 
     def __init__(self, proxy, method):
         self.proxy = proxy
-        self.method = method    
+        self.method = method
 
 
 class AsyncRemoteMethod(RemoteMethodBase):
@@ -227,13 +229,13 @@ class RemoteRPCError(RPCError):
     ename = None
     evalue = None
     traceback = None
-    
+
     def __init__(self, ename, evalue, tb):
         self.ename = ename
         self.evalue = evalue
         self.traceback = tb
         self.args = (ename, evalue)
-    
+
     def __repr__(self):
         return "<RemoteError:%s(%s)>" % (self.ename, self.evalue)
 

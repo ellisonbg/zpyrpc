@@ -14,4 +14,3 @@ setup(
     keywords = "ZeroMQ Tornado PyZMQ",
     url = "http://github.com/ellisonbg/zpyrpc",
 )
-
